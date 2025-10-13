@@ -22,7 +22,7 @@ ingress:
   tls:
     - secretName: pyroscope-tls
   annotations:
-  #   cert-manager.io/private-key-size: "4096"
-  #   cert-manager.io/common-name: "pyroscope.pkflores.io"
+    cert-manager.io/private-key-size: "4096"
+    cert-manager.io/common-name: "pyroscope.pkflores.io"
     external-dns.alpha.kubernetes.io/hostname: "pyroscope.pkflores.io"
-    external-dns.alpha.kubernetes.io/target: "192.168.10.195"
+    #external-dns.alpha.kubernetes.io/target: "192.168.10.195"
