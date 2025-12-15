@@ -17,8 +17,7 @@ This repository contains ArgoCD manifests for deploying Grafana Pyroscope (conti
 ### Key Files
 
 - [deploy/project.yaml](deploy/project.yaml) - ArgoCD project resource defining permissions and allowed sources/destinations
-- [deploy/appset.yaml](deploy/appset.yaml) - ArgoCD ApplicationSet that deploys the Pyroscope Helm chart
-- [deploy/pyroscope-values.yaml](deploy/pyroscope-values.yaml) - Reference Helm values (embedded in appset.yaml)
+- [deploy/appset.yaml](deploy/appset.yaml) - ArgoCD ApplicationSet that deploys the Pyroscope Helm chart with embedded Helm values
 
 ### Infrastructure Details
 
@@ -89,7 +88,6 @@ This repository follows the standard app-of-apps pattern used across the homelab
 - `deploy/` - ArgoCD manifests
   - `project.yaml` - ArgoCD AppProject
   - `appset.yaml` - ArgoCD ApplicationSet with embedded Helm values
-  - `pyroscope-values.yaml` - Reference values file (not used directly)
 
 ## Migration Notes
 
