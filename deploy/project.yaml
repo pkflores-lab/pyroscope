@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: pyroscope
+  namespace: argocd
+spec:
+  description: Grafana Pyroscope continuous profiling platform
+
+  # Source repositories that applications in this project can deploy from
+  sourceRepos:
+    - '*'
+
+  # Destination clusters and namespaces that applications can deploy to
+  destinations:
+    - namespace: observability
+      server: '*'
+
+  # Cluster resource whitelist - allows all cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Namespace resource whitelist - allows all namespaced resources
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Roles for project access
+  roles:
+    - name: read-only
+      description: Read-only access to pyroscope applications
+      policies:
+        - p, proj:pyroscope:read-only, applications, get, pyroscope/*, allow
+    - name: admin
+      description: Admin access to pyroscope applications
+      policies:
+        - p, proj:pyroscope:admin, applications, *, pyroscope/*, allow

@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: pyroscope-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - merge:
+        mergeKeys:
+          - server
+        generators:
+          - list:
+              elements:
+                - server: https://kubernetes.default.svc
+                  namespace: observability
+                  project: pyroscope
+                  name: pyroscope
+                  repoURL: https://grafana.github.io/helm-charts
+                  chart: pyroscope
+                  revision: 1.15.1
+          - list:
+              elements:
+                - server: https://kubernetes.default.svc
+                  clusterName: in-cluster
+          - clusters:
+              selector:
+                matchLabels:
+                  active: 'true'
+              values:
+                clusterName: '{{.name}}'
+  template:
+    metadata:
+      name: '{{.name}}-{{.clusterName}}'
+      labels:
+        app: '{{.name}}'
+        cluster: '{{.clusterName}}'
+        portal.homelab/repository: pyroscope
+    spec:
+      project: '{{.project}}'
+      source:
+        repoURL: '{{.repoURL}}'
+        chart: '{{.chart}}'
+        targetRevision: '{{.revision}}'
+        helm:
+          releaseName: pyroscope
+          values: |-
+            service:
+              type: ClusterIP
+
+            # For quick local experiments, skip persistence.
+            # (Switch to enabled: true and a proper storageClass for real use.)
+            persistence:
+              enabled: false
+
+            # Reduce resources for tiny laptops; bump as you like.
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+            ingress:
+              enabled: true
+              className: nginx
+              hosts:
+                - pyroscope.pkflores.io
+              tls:
+                - secretName: pyroscope-tls
+              annotations:
+                cert-manager.io/private-key-size: "4096"
+                cert-manager.io/common-name: "pyroscope.pkflores.io"
+                external-dns.alpha.kubernetes.io/hostname: "pyroscope.pkflores.io"
+      destination:
+        server: '{{.server}}'
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
